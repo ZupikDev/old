@@ -52,7 +52,8 @@ void print_world(const int size, int items[SIZE][SIZE])
 	
 }
 
-void sub_ask(int &output, std::string msg) {
+template<typename T>
+void sub_ask(T &output, std::string msg) {
 	std::cout << msg;
 	while (!(std::cin >> output)) {
 		std::cout << "An error.\n";
@@ -64,14 +65,15 @@ void sub_ask(int &output, std::string msg) {
 
 void ask(int output[SIZE][SIZE], int player) {
 	int line = 1, col = 1;
+	do {
+		do {
+			sub_ask(line, "Enter the target line : ");
+		} while (!(line > 0 && line <= 3));
 
-	do {
-		sub_ask(line, "Enter the target line : ");
-	} while (!(line > 0 && line <= 3));
-	
-	do {
-		sub_ask(col, "Enter the target colum : ");
-	} while (!(col > 0 && col <= 3));
+		do {
+			sub_ask(col, "Enter the target colum : ");
+		} while (!(col > 0 && col <= 3));
+	} while (output[line - 1][col - 1] != 0) ;
 
 	output[line - 1][col - 1] = player;
 }
@@ -89,7 +91,16 @@ int check_if_playable(int pos[SIZE][SIZE]) {
 	if (((pos[0][0] == pos[1][1] && pos[1][1] == pos[2][2])
 		|| (pos[0][2] == pos[1][1] && pos[1][1] == pos[2][0])) && pos[1][1] != 0) return 0;
 
-	return 1;
+	// empty cases ? 
+	int count = 0;
+	for (int i = 0; i < 3; i++) {
+		for (int j = 0; j < 3; j++) {
+			if (pos[i][j] == 0) count++;
+		}
+	}
+
+	if (count > 0) return 1;
+	return -1;
 }
 
 void change_line_test(int line_to_change, int arr[3][3], int num) {
@@ -136,40 +147,47 @@ int main(void) {
 
 	tests();
 
-	int positions[SIZE][SIZE] = { { 0,0,0 }, 
-								  { 0,0,0 },
-								  { 0,0,0 } };
 	int playable = 1; // -1 = jeu nul | 0 = plus jouable | 1 = jouable | 
+	std::string player1, player2;
+	sub_ask(player1, "Name of the player 1 : ");
+	sub_ask(player2, "Name of the player 2 : ");
 
-	print_world(SIZE, positions); std::cout << "\n";
-
-	while (playable == 1)
-	{
-		std::cout << "joueur 1 : \n";
-		ask(positions, 1); std::cout << "\n";
+	bool again = true;
+	do {
+		int positions[SIZE][SIZE] = {{ 0,0,0 },
+									 { 0,0,0 },
+									 { 0,0,0 } };
 		print_world(SIZE, positions); std::cout << "\n";
-		playable = check_if_playable(positions);
-		if (playable == 0) {
-			std::cout << "Bravo au joueur 1 !";
-			break;
+		while (playable == 1)
+		{
+			std::cout << player1 << "\n";
+			ask(positions, 1); std::cout << "\n";
+			print_world(SIZE, positions); std::cout << "\n";
+			playable = check_if_playable(positions);
+			if (playable == 0) {
+				std::cout << "Bravo à " << player1 << " !\n";
+				break;
+			}
+			if (playable == -1) {
+				std::cout << "jeu nul !\n";
+				break;
+			}
+			std::cout << player2 << "\n";
+			ask(positions, 2); std::cout << "\n";
+			print_world(SIZE, positions); std::cout << "\n";
+			playable = check_if_playable(positions);
+			if (playable == 0) {
+				std::cout << "Bravo à " << player2 << " !\n";
+				break;
+			}
+			if (playable == -1) {
+				std::cout << "jeu nul !\n";
+				break;
+			}
 		}
-		if (playable == -1) {
-			std::cout << "jeu nul !";
-			break;
-		}
-		std::cout << "joueur 2 : \n";
-		ask(positions, 2); std::cout << "\n";
-		print_world(SIZE, positions); std::cout << "\n";
-		playable = check_if_playable(positions);
-		if (playable == 0) {
-			std::cout << "Bravo au joueur 2 !";
-			break;
-		}
-		if (playable == -1) {
-			std::cout << "jeu nul !";
-			break;
-		}
-	}
+		sub_ask(again, "Encore une partie ? (1 pour oui, 0 pour non) : ");
+		if (again == 1) playable = 1;
+	} while (again == true);
 
 	return 0;
 }
