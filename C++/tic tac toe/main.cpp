@@ -1,11 +1,9 @@
 #include <iostream>
 #include <assert.h>
 
-const int SIZE = 3;
-
-void print_line(int item[SIZE])
+void print_line(int item[3])
 {
-	int line_size = SIZE * SIZE - SIZE / 3 - 1;
+	int line_size = 7;
 	int compteur = 0;
 
 	for (int i = 0; i < line_size; i++) {
@@ -30,18 +28,18 @@ void print_line(int item[SIZE])
 	}
 }
 
-void print_world(const int size, int items[SIZE][SIZE])
+void print_world(const int size, int items[3][3])
 {
-	int input[SIZE] = { 0 };
-	int line_size = SIZE * SIZE - SIZE / 3 - 1;
+	int input[3] = { 0 };
+	int line_size = 7;
 
 	for (int i = 0; i < line_size; i++) {
 		std::cout << "-";
 	}
 	std::cout << "\n";
 
-	for (int i = 0; i < SIZE; i++) {
-		for (int j = 0; j < SIZE; j++) input[j] = items[i][j];
+	for (int i = 0; i < 3; i++) {
+		for (int j = 0; j < 3; j++) input[j] = items[i][j];
 		print_line(input);
 		std::cout << "\n";
 	}
@@ -63,7 +61,7 @@ void sub_ask(T &output, std::string msg) {
 	}
 }
 
-void ask(int output[SIZE][SIZE], int player) {
+void ask(int output[3][3], int player) {
 	int line = 1, col = 1;
 	do {
 		do {
@@ -78,7 +76,7 @@ void ask(int output[SIZE][SIZE], int player) {
 	output[line - 1][col - 1] = player;
 }
 
-int check_if_playable(int pos[SIZE][SIZE]) {
+int check_if_playable(int pos[3][3]) {
 	// lines
 	for (int i = 0; i < 3; i++) {
 		if ((pos[i][0] == pos[i][1] && pos[i][1] == pos[i][2]) && pos[i][0] != 0) return 0;
@@ -141,9 +139,9 @@ void tests() {
 
 int main(void) {
 	void tests(void);
-	void print_world(const int, int[SIZE][SIZE]);
-	void ask(int[SIZE][SIZE], int);
-	int check_if_playable(int[SIZE][SIZE]);
+	void print_world(const int, int[3][3]);
+	void ask(int[3][3], int);
+	int check_if_playable(int[3][3]);
 
 	tests();
 
@@ -154,15 +152,15 @@ int main(void) {
 
 	bool again = true;
 	do {
-		int positions[SIZE][SIZE] = {{ 0,0,0 },
+		int positions[3][3] = {{ 0,0,0 },
 									 { 0,0,0 },
 									 { 0,0,0 } };
-		print_world(SIZE, positions); std::cout << "\n";
+		print_world(3, positions); std::cout << "\n";
 		while (playable == 1)
 		{
 			std::cout << player1 << "\n";
 			ask(positions, 1); std::cout << "\n";
-			print_world(SIZE, positions); std::cout << "\n";
+			print_world(3, positions); std::cout << "\n";
 			playable = check_if_playable(positions);
 			if (playable == 0) {
 				std::cout << "Bravo à " << player1 << " !\n";
@@ -174,7 +172,7 @@ int main(void) {
 			}
 			std::cout << player2 << "\n";
 			ask(positions, 2); std::cout << "\n";
-			print_world(SIZE, positions); std::cout << "\n";
+			print_world(3, positions); std::cout << "\n";
 			playable = check_if_playable(positions);
 			if (playable == 0) {
 				std::cout << "Bravo à " << player2 << " !\n";
