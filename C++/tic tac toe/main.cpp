@@ -1,5 +1,4 @@
 #include <iostream>
-#include <assert.h>
 #include <stddef.h>
 #include <limits>
 #include <map>
@@ -50,7 +49,7 @@ void print_world(std::map<int, std::string> world) {
 
 void reset_world(std::map<int, std::string>& world) {
 	for (int i = 0; i < 9; i++) {
-		world[i] = std::to_string(i + 1);
+		world[i] = ' ';
 	}
 }
 
@@ -98,7 +97,7 @@ int check_if_playable(std::map<int, std::string> world) {
 
 	// empty cases ?
 	for (int i = 0; i < 9; i++) {
-		if (world[i] == std::to_string(i + 1)) return 1;
+		if (!(world[i] == "x" || world[i] == "o")) return 1;
 	}
 
 	return -1;
