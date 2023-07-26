@@ -59,7 +59,7 @@ int main() {
 		game.printBoard(window);
 
 		while (window.pollEvent(events) && playable) {
-			if (events.type == sf::Event::Closed) window.close();
+		    if (events.type == sf::Event::Closed) window.close();
 
             if (events.type == sf::Event::MouseMoved) {
                 started = true;
