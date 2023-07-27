@@ -13,7 +13,7 @@ void printSprite(sf::RenderWindow& window, sf::Sprite sprite, float x, float y) 
 	sprite.setPosition(x, y); window.draw(sprite);
 }
 
-void printTics(sf::RenderWindow& window, std::vector<sf::Sprite>& vector) {
+void printPlayer(sf::RenderWindow& window, std::vector<sf::Sprite>& vector) {
 	for (auto& vect : vector) {
 		window.draw(vect);
 	}
@@ -36,7 +36,6 @@ bool Used(sf::RectangleShape sprite, int player1, int player2) {
 	int before1 = player1; int before2 = player2;
 	changeValueOfPlayer(player1, coords);
 	changeValueOfPlayer(player2, coords);
-
 	if (before1 == player1 || before2 == player2) return true;
 	else return false;
 }

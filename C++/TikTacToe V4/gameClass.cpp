@@ -1,5 +1,8 @@
 #include "gameClass.h"
 #include "entityClass.h"
+#include "utilsFunc.h"
+
+#include <iostream>
 
 #include <array>
 
@@ -20,7 +23,7 @@ bool Game::hasWon(int boardPlacements) {
 	});
 }
 
-void Game::Init() {
+void Game::Init(sf::RenderWindow& w) {
 
 	for (int i = 0 ; i < 9; i++) tiles.emplace_back(sf::RectangleShape(sf::Vector2f(133.f, 133.f)));
 	
@@ -31,13 +34,54 @@ void Game::Init() {
 			x++;
 		}
 	}
-}
 
-void Game::printBoard(sf::RenderWindow& window) {
 	for (auto& tile : tiles) {
 		tile.setFillColor(sf::Color(13, 13, 13));
 		tile.setOutlineThickness(2.f);
 		tile.setOutlineColor(sf::Color::White);
-		window.draw(tile);
 	}
+
+	window = &w;
+
+}
+
+void Game::printBoard() {
+	for (auto& tile : tiles) {
+		window->draw(tile);
+	}
+}
+
+bool Game::pollEvents(sf::Event& events) {
+	return window->pollEvent(events);
+}
+
+void Game::render(int& player, sf::Sprite what, std::vector<sf::Sprite>& whereToAdd, std::pair<float, float> coords) {
+	int before = player; 
+	changeValueOfPlayer(player, coords);
+
+	if (player != before) {
+		what.setPosition(sf::Vector2f(coords.first + 18, coords.second + 18));
+		whereToAdd.push_back(what);
+	}
+}
+
+void Game::checkIfWon() {
+	if (hasWon(tics)) {
+		std::cout << "Player A has won";
+		playable = false;
+	}
+	else if (hasWon(tacs)) {
+		std::cout << "Player B has won";
+		playable = false;
+	}
+	else if ((tics | tacs) == 0b111111111) {
+		std::cout << "Well played !";
+		playable = false;
+	}
+}
+
+void Game::update(sf::Sprite Tsprite, float Tx, float Ty, std::vector<sf::Sprite>& playerA, std::vector<sf::Sprite>& playerB) {
+	printSprite(*window, Tsprite, Tx, Ty);
+	printPlayer(*window, playerA);
+	printPlayer(*window, playerB);
 }

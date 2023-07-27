@@ -8,9 +8,6 @@
 #include <array>
 
 int main() {
-	sf::RenderWindow window(sf::VideoMode(400, 400), "Morpion V3", sf::Style::Close);
-	sf::Event events;
-
     //Transparent circle
     sf::Texture Tcircle_image;
     sf::Sprite Tcircle_sprite;
@@ -39,51 +36,49 @@ int main() {
     Tcross_sprite.setTexture(Tcross_texture);
     Tcross_sprite.scale(0.7f, 0.7f);
 
-	int tics{ 0 }, tacs{ 0 }; // player 1, player 2
     bool p1 = true;
-    sf::Sprite sprite;
+    sf::Sprite Tsprite;
     sf::RectangleShape current;
     bool started = false;
     bool canSwitch = true;
 
-    bool playable = true;
-
     std::vector<sf::Sprite> circles;
     std::vector<sf::Sprite> crosses;
 
+    sf::RenderWindow gameWindow(sf::VideoMode(400, 400), "Morpion V3", sf::Style::Close);
+    sf::Event events;
+
 	Game game;
-	game.Init();
+	game.Init(gameWindow);
 
-	while (window.isOpen()) {
+    while (game.window->isOpen()) {
 
-		game.printBoard(window);
+		game.printBoard();
 
-		while (window.pollEvent(events) && playable) {
-		    if (events.type == sf::Event::Closed) window.close();
+		while (game.pollEvents(events)) {
 
-            if (events.type == sf::Event::MouseMoved) {
+			if (events.type == sf::Event::Closed) gameWindow.close();
+
+            if (events.type == sf::Event::MouseMoved && game.playable) {
                 started = true;
+
                 for (auto& tile : game.tiles) {
                     if (isIn(tile, static_cast<float>(events.mouseMove.x), static_cast<float>(events.mouseMove.y))) current = tile;
                 }
             }
 
-            if (events.type == sf::Event::MouseButtonPressed) {
-                if (Used(current, tics, tacs)) canSwitch = false;
+            if (events.type == sf::Event::MouseButtonPressed && game.playable) {
+
+                if (Used(current, game.tics, game.tacs)) canSwitch = false;
                 else canSwitch = true;
+
                 if (p1 && canSwitch) {
                     for (auto& tile : game.tiles) {
                         if (tile.getGlobalBounds() == current.getGlobalBounds()) {
-                            std::pair<float, float> coords = { tile.getGlobalBounds().getPosition().x, tile.getGlobalBounds().getPosition().y };
 
-                            int before = tics;
-                            changeValueOfPlayer(tics, coords);
-
-                            if (tics != before) {
-                                circle_sprite.setPosition(sf::Vector2f(tile.getGlobalBounds().getPosition().x + 18, tile.getGlobalBounds().getPosition().y + 18));
-                                circles.push_back(circle_sprite);
-                            }
-
+                            std::pair<float, float> coords = { tile.getGlobalBounds().getPosition().x, tile.getGlobalBounds().getPosition().y};
+                            game.render(game.tics, circle_sprite, circles, coords);
+                           
                             break;
                         }
                     }
@@ -91,54 +86,29 @@ int main() {
                 else if (!p1 && canSwitch) {
                     for (auto& tile : game.tiles) {
                         if (tile.getGlobalBounds() == current.getGlobalBounds()) {
+
                             std::pair<float, float> coords = { tile.getGlobalBounds().getPosition().x, tile.getGlobalBounds().getPosition().y };
-
-                            int before = tacs;
-                            changeValueOfPlayer(tacs, coords);
-
-                            if (tacs != before) {
-                                cross_sprite.setPosition(sf::Vector2f(tile.getGlobalBounds().getPosition().x + 18, tile.getGlobalBounds().getPosition().y + 18));
-                                crosses.push_back(cross_sprite);
-                            }
+                            game.render(game.tacs, cross_sprite, crosses, coords);
 
                             break;
                         }
                     }
                 }
 
-                if (game.hasWon(tics)) {
-                    std::cout << "Player A has won";
-                    playable = false;
-                }
-                else if (game.hasWon(tacs)) {
-                    std::cout << "Player B has won";
-                    playable = false;;
-                }
-                else if ((tics | tacs) == 0b111111111) {
-                    std::cout << "Well played !";
-                    playable = false;;
-                }
-
-                if (p1 && canSwitch) {
-                    sprite = Tcircle_sprite;
-                    p1 = false;
-                }
-                else if (!p1 && canSwitch) {
-                    sprite = Tcross_sprite;
-                    p1 = true;
-                }
+                game.checkIfWon();
+               
+                if (p1 && canSwitch) { Tsprite = Tcircle_sprite; p1 = false; }
+                else if (!p1 && canSwitch) { Tsprite = Tcross_sprite;  p1 = true; }
             }
 		}
 
-        if (p1 && started)
-            printSprite(window, Tcircle_sprite, current.getGlobalBounds().getPosition().x + 18, current.getGlobalBounds().getPosition().y + 18);
-        else if (!p1 && started) 
-            printSprite(window, Tcross_sprite, current.getGlobalBounds().getPosition().x + 18, current.getGlobalBounds().getPosition().y + 18);
-
-        printTics(window, circles);
-        printTics(window, crosses);
-          
-		window.display();
-        window.clear();
+        
+        if (started) {
+            if (p1) game.update(Tcircle_sprite, current.getGlobalBounds().getPosition().x + 18, current.getGlobalBounds().getPosition().y + 18, circles, crosses);
+            else game.update(Tcross_sprite, current.getGlobalBounds().getPosition().x + 18, current.getGlobalBounds().getPosition().y + 18, circles, crosses);
+        }
+           
+        game.window->display(); // or gameWindow.display()
+        game.window->clear();
 	}
 }

@@ -33,13 +33,20 @@ struct Pairs {
 
 class Game {
 public:
-	Game() {};
-	void Init();
-	void printBoard(sf::RenderWindow&);
+	Game() = default;
+	void Init(sf::RenderWindow&);
+	void printBoard();
 	bool hasWon(int boardPlacements);
+	bool pollEvents(sf::Event&);
+	void render(int&, sf::Sprite, std::vector<sf::Sprite>&, std::pair<float, float>);
+	void checkIfWon();
+	void update(sf::Sprite, float, float, std::vector<sf::Sprite>&, std::vector<sf::Sprite>&);
 
 public:
 	std::vector<sf::RectangleShape> tiles;
+	sf::RenderWindow* window;
+	int tics = 0; int tacs = 0;
+	bool playable = true;
 };
 
 
